@@ -1,77 +1,4 @@
-// chrome.webRequest.onBeforeRequest.addListener(
-//     function(details)
-//     {
-//         if(details.url.includes('/api/'))
-//         {
-//             const apiCall= {
-//                 url:details.url,
-//                 method: details.method,
-//                 timeStamp: new Date().toISOString(),
-//                 type: details.type,
-//                 requestId: details.requestId
-//             }
 
-//             chrome.storage.local.get(['apiLogs'],function(result)
-//             {
-//                 const apiLogs=result.apiLogs || [];
-//                 apiLogs.push(apiCall);
-//                 chrome.storage.local.set({apiLogs:apiLogs},function(){
-//                     console.log('API call logged:',apiCall)
-//                 });
-//             });
-//         }
-//     },
-//     {urls:['<all_urls>']},
-//     ['requestBody']
-// );
-
-// chrome.webRequest.onCompleted.addListener(
-//     function(details)
-//     {
-//         if(details.url.includes('/api/'))
-//         {
-//             chrome.storage.local.get(['apiLogs'],function(result)
-//             {
-//                 const apiLogs = result.apiLogs || [];
-//                 const logEntry = apiLogs.find(log =>log.requestId===details.requestId);
-//                 if(logEntry)
-//                 {
-//                     logEntry.statusCode = details.statusCode;
-//                     logEntry.statusLine = details.statusLine;
-//                     logEntry.responseTime = details.timeStamp;
-//                     chrome.storage.local.set({apiLogs:apiLogs},function(){
-//                         console.log('API response logged', logEntry);
-//                     });
-//                 }
-//             });
-//         }
-//     },
-//     {urls:['<all_urls>']}
-// );
-
-// chrome.webRequest.onErrorOccurred.addListener(
-//     function(details)
-//     {
-//         if(details.url.includes('/api/'))
-//         {
-//             chrome.storage.local.get(['apiLogs'],function(result)
-//             {
-//                 const apiLogs = result.apiLogs || [];
-//                 const logEntry = apiLogs.find(log =>log.requestId===details.requestId);
-//                 if(logEntry)
-//                 {
-//                     logEntry.error = details.error;
-//                     chrome.storage.local.set({apiLogs:apiLogs},function(){
-//                         console.log('API error logged', logEntry);
-//                     });
-//                 }
-//             });
-//         }
-//     },
-//     {urls:['<all_urls>']}
-// );
-
-// Helper functions for storage
 const getStorage = (key) =>
   new Promise((resolve) => chrome.storage.local.get([key], resolve));
 
@@ -80,7 +7,9 @@ const setStorage = (data) =>
 
 // Log API requests
 async function handleBeforeRequest(details) {
-  if (details.type === "xmlhttprequest" || details.type === "fetch") {
+  if (details.type != "image" &&  details.type != "script" &&  details.type != "stylesheet"
+      && details.type!= "main_frame" && details.type!= "ping"
+  ) {
     const apiCall = {
       url: details.url,
       method: details.method,
@@ -103,7 +32,9 @@ async function handleBeforeRequest(details) {
 
 // Log API responses
 async function handleCompleted(details) {
-  if (details.type === "xmlhttprequest" || details.type === "fetch") {
+  if (details.type != "image" &&  details.type != "script" &&  details.type != "stylesheet"
+      && details.type!= "main_frame" && details.type!= "ping"
+  ) {
     const result = await getStorage('apiLogs');
     const apiLogs = result.apiLogs || [];
     const logEntry = apiLogs.find(log => log.requestId === details.requestId);
@@ -121,7 +52,9 @@ async function handleCompleted(details) {
 
 // Log API errors
 async function handleError(details) {
-  if (details.url.includes('/api/')) {
+ if (details.type != "image" &&  details.type != "script" &&  details.type != "stylesheet"
+      && details.type!= "main_frame" && details.type!= "ping"
+  ) {
     const result = await getStorage('apiLogs');
     const apiLogs = result.apiLogs || [];
     const logEntry = apiLogs.find(log => log.requestId === details.requestId);
