@@ -80,7 +80,7 @@ const setStorage = (data) =>
 
 // Log API requests
 async function handleBeforeRequest(details) {
-  if (details.url.includes('/api/')) {
+  if (details.type === "xmlhttprequest" || details.type === "fetch") {
     const apiCall = {
       url: details.url,
       method: details.method,
@@ -103,7 +103,7 @@ async function handleBeforeRequest(details) {
 
 // Log API responses
 async function handleCompleted(details) {
-  if (details.url.includes('/api/')) {
+  if (details.type === "xmlhttprequest" || details.type === "fetch") {
     const result = await getStorage('apiLogs');
     const apiLogs = result.apiLogs || [];
     const logEntry = apiLogs.find(log => log.requestId === details.requestId);
