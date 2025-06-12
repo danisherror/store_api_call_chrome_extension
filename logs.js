@@ -71,8 +71,8 @@ function applyFilters() {
 
       if (statusFilter === 'success' && !(statusCode >= 200 && statusCode < 400)) return false;
       if (statusFilter === 'error' && !(statusCode >= 400 && statusCode < 600)) return false;
-      if (statusFilter === 'pending' && !log.statusCode && !log.error) return false;
-      if (statusFilter === 'failed' && !statusCode && log.error) return false;
+      if (statusFilter === 'pending' && (log.statusCode || log.error) ) return false;
+      if (statusFilter === 'failed' && !(hasError && !log.statusCode)) return false;
     }
     return true;
   });
