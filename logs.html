@@ -12,51 +12,85 @@
     h1 {
       text-align: center;
     }
+    .filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    select, input[type="text"] {
+      padding: 8px;
+      font-size: 14px;
+      min-width: 120px;
+      box-sizing: border-box;
+    }
+    #tableContainer {
+      max-height: 500px;  /* fixed max height */
+      overflow-y: auto;   /* vertical scrollbar */
+      border: 1px solid #ccc;
+      background: white;
+      border-radius: 4px;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 20px;
+      min-width: 700px; /* to enable horizontal scroll if small screen */
     }
     th, td {
       padding: 10px;
       border: 1px solid #ddd;
       text-align: left;
+      white-space: nowrap;
     }
     th {
       background: #4CAF50;
       color: white;
       cursor: pointer;
+      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
     tr:nth-child(even) {
       background: #f2f2f2;
-    }
-    #searchInput {
-      margin-bottom: 10px;
-      padding: 8px;
-      width: 100%;
-      font-size: 16px;
-      box-sizing: border-box;
     }
   </style>
 </head>
 <body>
   <h1>API Logs</h1>
-  <input type="text" id="searchInput" placeholder="Search URL or method..." />
-  <table id="apiTable">
-    <thead>
-      <tr>
-        <th data-key="url">URL</th>
-        <th data-key="method">Method</th>
-        <th data-key="statusCode">Status / Error</th>
-        <th data-key="timeStamp">Request Time</th>
-        <th data-key="responseTime">Response Time</th>
-        <th data-key="type">Type</th>
-      </tr>
-    </thead>
-    <tbody id="apiTableBody">
-      <!-- Rows will be added here -->
-    </tbody>
-  </table>
+
+  <div class="filters">
+    <input type="text" id="searchInput" placeholder="Search URL or method..." />
+    <select id="methodFilter">
+      <option value="">All Methods</option>
+      <!-- dynamically filled -->
+    </select>
+    <select id="statusFilter">
+      <option value="">All Status</option>
+      <option value="success">Success (2xx,3xx)</option>
+      <option value="error">Error (4xx,5xx)</option>
+      <option value="pending">Pending</option>
+      <option value="failed">Failed (network error)</option>
+    </select>
+  </div>
+
+  <div id="tableContainer">
+    <table id="apiTable">
+      <thead>
+        <tr>
+          <th data-key="url">URL</th>
+          <th data-key="method">Method</th>
+          <th data-key="statusCode">Status / Error</th>
+          <th data-key="timeStamp">Request Time</th>
+          <th data-key="responseTime">Response Time</th>
+          <th data-key="type">Type</th>
+        </tr>
+      </thead>
+      <tbody id="apiTableBody">
+        <!-- Rows will be added here -->
+      </tbody>
+    </table>
+  </div>
 
   <script src="logs.js"></script>
 </body>

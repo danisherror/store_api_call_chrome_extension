@@ -1,12 +1,19 @@
 let logs = [];
+let filteredLogs = [];
 
 function renderTable(data) {
   const tbody = document.getElementById('apiTableBody');
   tbody.innerHTML = '';
+  if(data.length === 0) {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td colspan="6" style="text-align:center;">No matching logs found</td>`;
+    tbody.appendChild(row);
+    return;
+  }
   data.forEach(log => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${log.url}</td>
+      <td title="${log.url}">${log.url}</td>
       <td>${log.method}</td>
       <td>${log.statusCode || log.error || 'Pending'}</td>
       <td>${log.timeStamp}</td>
@@ -17,6 +24,7 @@ function renderTable(data) {
   });
 }
 
+// Sort by key helper
 function sortByKey(array, key, asc = true) {
   return array.sort((a, b) => {
     if (!a[key]) return 1;
@@ -27,28 +35,70 @@ function sortByKey(array, key, asc = true) {
   });
 }
 
-// Sorting
+// Extract unique methods for filter dropdown
+function populateMethodFilter() {
+  const methodSet = new Set(logs.map(log => log.method));
+  const select = document.getElementById('methodFilter');
+  methodSet.forEach(method => {
+    const option = document.createElement('option');
+    option.value = method;
+    option.textContent = method;
+    select.appendChild(option);
+  });
+}
+
+// Apply filters + search and render table
+function applyFilters() {
+  const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+  const methodFilter = document.getElementById('methodFilter').value;
+  const statusFilter = document.getElementById('statusFilter').value;
+
+  filteredLogs = logs.filter(log => {
+    // Search filter
+    const matchSearch = log.url.toLowerCase().includes(searchQuery) ||
+                        log.method.toLowerCase().includes(searchQuery);
+
+    if (!matchSearch) return false;
+
+    // Method filter
+    if (methodFilter && log.method !== methodFilter) return false;
+
+    // Status filter
+    if (statusFilter) {
+      const statusCode = log.statusCode || 0;
+      const hasError = !!log.error;
+
+      if (statusFilter === 'success' && !(statusCode >= 200 && statusCode < 400)) return false;
+      if (statusFilter === 'error' && !(statusCode >= 400 && statusCode < 600)) return false;
+      if (statusFilter === 'pending' && !log.statusCode && !log.error) return false;
+      if (statusFilter === 'failed' && !statusCode && log.error) return false;
+    }
+
+    return true;
+  });
+
+  renderTable(filteredLogs);
+}
+
+// Sorting on header click
 document.querySelectorAll('th').forEach(header => {
   header.addEventListener('click', () => {
     const key = header.dataset.key;
     const asc = header.asc = !header.asc;
-    logs = sortByKey(logs, key, asc);
-    renderTable(logs);
+    filteredLogs = sortByKey(filteredLogs, key, asc);
+    renderTable(filteredLogs);
   });
 });
 
-// Search filter
-document.getElementById('searchInput').addEventListener('input', (e) => {
-  const query = e.target.value.toLowerCase();
-  const filtered = logs.filter(log =>
-    log.url.toLowerCase().includes(query) ||
-    log.method.toLowerCase().includes(query)
-  );
-  renderTable(filtered);
-});
+// Event listeners for filters
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('methodFilter').addEventListener('change', applyFilters);
+document.getElementById('statusFilter').addEventListener('change', applyFilters);
 
-// Load logs from storage
+// Load logs from storage and initialize
 chrome.storage.local.get(['apiLogs'], (result) => {
   logs = result.apiLogs || [];
-  renderTable(logs);
+  populateMethodFilter();
+  filteredLogs = [...logs];
+  renderTable(filteredLogs);
 });
