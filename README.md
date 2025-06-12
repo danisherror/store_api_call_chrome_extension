@@ -11,3 +11,5 @@
     - after doing changes into the code, go to the chrome extension page and click on refresh the extension, it will load the extension with your changes
 
 -------------------
+
+![Alt text](images/image_1.png)
