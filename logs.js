@@ -27,11 +27,9 @@ function renderTable(data) {
 // Sort by key helper
 function sortByKey(array, key, asc = true) {
   return array.sort((a, b) => {
-    // Handle undefined/null values safely
     if (a[key] == null) return 1;
     if (b[key] == null) return -1;
 
-    // Compare strings case-insensitive
     const valA = (typeof a[key] === 'string') ? a[key].toLowerCase() : a[key];
     const valB = (typeof b[key] === 'string') ? b[key].toLowerCase() : b[key];
 
@@ -45,7 +43,6 @@ function sortByKey(array, key, asc = true) {
 function populateMethodFilter() {
   const methodSet = new Set(logs.map(log => log.method));
   const select = document.getElementById('methodFilter');
-  // Clear existing options except first
   select.querySelectorAll('option:not(:first-child)').forEach(opt => opt.remove());
   methodSet.forEach(method => {
     const option = document.createElement('option');
@@ -62,16 +59,12 @@ function applyFilters() {
   const statusFilter = document.getElementById('statusFilter').value;
 
   filteredLogs = logs.filter(log => {
-    // Search filter (on url or method)
     const matchSearch = log.url.toLowerCase().includes(searchQuery) ||
                         log.method.toLowerCase().includes(searchQuery);
-
     if (!matchSearch) return false;
 
-    // Method filter
     if (methodFilter && log.method !== methodFilter) return false;
 
-    // Status filter
     if (statusFilter) {
       const statusCode = log.statusCode || 0;
       const hasError = !!log.error;
@@ -81,7 +74,6 @@ function applyFilters() {
       if (statusFilter === 'pending' && !log.statusCode && !log.error) return false;
       if (statusFilter === 'failed' && !statusCode && log.error) return false;
     }
-
     return true;
   });
 
@@ -110,7 +102,6 @@ document.getElementById('clearLogsBtn').addEventListener('click', () => {
       logs = [];
       filteredLogs = [];
       renderTable([]);
-      // Reset filters
       document.getElementById('searchInput').value = '';
       document.getElementById('methodFilter').value = '';
       document.getElementById('statusFilter').value = '';
@@ -125,4 +116,14 @@ chrome.storage.local.get(['apiLogs'], (result) => {
   populateMethodFilter();
   filteredLogs = [...logs];
   renderTable(filteredLogs);
+});
+
+// Listen for storage changes and update the table dynamically
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === 'local' && changes.apiLogs) {
+    logs = changes.apiLogs.newValue || [];
+    populateMethodFilter();
+    filteredLogs = [...logs];
+    applyFilters();
+  }
 });
