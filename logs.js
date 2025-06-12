@@ -45,6 +45,8 @@ function sortByKey(array, key, asc = true) {
 function populateMethodFilter() {
   const methodSet = new Set(logs.map(log => log.method));
   const select = document.getElementById('methodFilter');
+  // Clear existing options except first
+  select.querySelectorAll('option:not(:first-child)').forEach(opt => opt.remove());
   methodSet.forEach(method => {
     const option = document.createElement('option');
     option.value = method;
@@ -100,6 +102,22 @@ document.querySelectorAll('th').forEach(header => {
 document.getElementById('searchInput').addEventListener('input', applyFilters);
 document.getElementById('methodFilter').addEventListener('change', applyFilters);
 document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+// Clear logs button handler
+document.getElementById('clearLogsBtn').addEventListener('click', () => {
+  if (confirm('Are you sure you want to clear all logs?')) {
+    chrome.storage.local.remove('apiLogs', () => {
+      logs = [];
+      filteredLogs = [];
+      renderTable([]);
+      // Reset filters
+      document.getElementById('searchInput').value = '';
+      document.getElementById('methodFilter').value = '';
+      document.getElementById('statusFilter').value = '';
+      alert('Logs cleared.');
+    });
+  }
+});
 
 // Load logs from storage and initialize
 chrome.storage.local.get(['apiLogs'], (result) => {
