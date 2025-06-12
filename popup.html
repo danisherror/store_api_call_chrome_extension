@@ -1,69 +1,23 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>API Logger</title>
+  <title>Open API Logs</title>
   <style>
     body {
+      width: 200px;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       font-family: Arial, sans-serif;
-      padding: 10px;
-      max-width: 800px;
-    }
-
-    h2 {
-      margin-top: 0;
-    }
-
-    button {
-      margin-bottom: 10px;
-      padding: 6px 12px;
-      font-size: 14px;
       cursor: pointer;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px;
-      text-align: left;
-      font-size: 13px;
-      word-break: break-word;
-    }
-
-    th {
-      background-color: #f2f2f2;
-    }
-
-    tr:hover {
-      background-color: #f9f9f9;
-    }
-
-    .error-row {
-      background-color: #ffe5e5;
+      user-select: none;
+      margin: 0;
     }
   </style>
 </head>
 <body>
-  <h2>Logged API Calls</h2>
-  <button id="clearBtn">Clear Logs</button>
-  <table>
-    <thead>
-      <tr>
-        <th>URL</th>
-        <th>Method</th>
-        <th>Status</th>
-        <th>Timestamp</th>
-      </tr>
-    </thead>
-    <tbody id="apiTableBody">
-      <!-- Rows will be populated by JavaScript -->
-    </tbody>
-  </table>
-
+  Open API Logs
   <script src="popup.js"></script>
 </body>
 </html>

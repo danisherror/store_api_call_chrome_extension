@@ -59,7 +59,7 @@ async function handleError(details) {
 chrome.webRequest.onBeforeRequest.addListener(
   handleBeforeRequest,
   { urls: ["<all_urls>"] },
-  ["requestBody"]
+  // ["requestBody"]
 );
 
 chrome.webRequest.onCompleted.addListener(handleCompleted, { urls: ["<all_urls>"] });
