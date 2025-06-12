@@ -12,4 +12,4 @@
 
 -------------------
 
-![Alt text](images\Image_1.png)
+![Alt text](images/Image_1.png)
