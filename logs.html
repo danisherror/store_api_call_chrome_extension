@@ -34,7 +34,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 700px; /* to enable horizontal scroll if small screen */
+      min-width: 700px; /* to enable horizontal scroll if needed */
     }
     th, td {
       padding: 10px;
@@ -53,6 +53,14 @@
     }
     tr:nth-child(even) {
       background: #f2f2f2;
+    }
+    /* Limit URL column width and show ellipsis */
+    td.url-cell {
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
     }
   </style>
 </head>

@@ -13,7 +13,7 @@ function renderTable(data) {
   data.forEach(log => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td title="${log.url}">${log.url}</td>
+      <td class="url-cell" title="${log.url}">${log.url}</td>
       <td>${log.method}</td>
       <td>${log.statusCode || log.error || 'Pending'}</td>
       <td>${log.timeStamp}</td>
@@ -27,10 +27,16 @@ function renderTable(data) {
 // Sort by key helper
 function sortByKey(array, key, asc = true) {
   return array.sort((a, b) => {
-    if (!a[key]) return 1;
-    if (!b[key]) return -1;
-    if (a[key] < b[key]) return asc ? -1 : 1;
-    if (a[key] > b[key]) return asc ? 1 : -1;
+    // Handle undefined/null values safely
+    if (a[key] == null) return 1;
+    if (b[key] == null) return -1;
+
+    // Compare strings case-insensitive
+    const valA = (typeof a[key] === 'string') ? a[key].toLowerCase() : a[key];
+    const valB = (typeof b[key] === 'string') ? b[key].toLowerCase() : b[key];
+
+    if (valA < valB) return asc ? -1 : 1;
+    if (valA > valB) return asc ? 1 : -1;
     return 0;
   });
 }
@@ -54,7 +60,7 @@ function applyFilters() {
   const statusFilter = document.getElementById('statusFilter').value;
 
   filteredLogs = logs.filter(log => {
-    // Search filter
+    // Search filter (on url or method)
     const matchSearch = log.url.toLowerCase().includes(searchQuery) ||
                         log.method.toLowerCase().includes(searchQuery);
 
